@@ -1,7 +1,8 @@
-# model.py
+# ml/model.py
 
 import joblib
 from config import MODEL_PATH
+
 
 class ApprovalModel:
     def __init__(self):
