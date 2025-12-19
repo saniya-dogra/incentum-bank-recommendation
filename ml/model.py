@@ -1,7 +1,7 @@
 # ml/model.py
 
 import joblib
-from config import MODEL_PATH
+from backend.config import MODEL_PATH
 
 
 class ApprovalModel:
