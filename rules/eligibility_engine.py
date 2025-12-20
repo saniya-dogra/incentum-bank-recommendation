@@ -1,19 +1,19 @@
 # rules/eligibility_engine.py
 
-from backend.rules.age_rules import check_age
-from backend.rules.income_rules import check_income
-from backend.rules.employment_rules import check_employment
-from backend.rules.property_rules import check_property
-from backend.rules.ltv_rules import check_ltv
-from backend.rules.foir_rules import allowed_foir
-from backend.rules.roi_rules import get_roi
-from backend.rules.special_cases import (
+from rules.age_rules import check_age
+from rules.income_rules import check_income
+from rules.employment_rules import check_employment
+from rules.property_rules import check_property
+from rules.ltv_rules import check_ltv
+from rules.foir_rules import allowed_foir
+from rules.roi_rules import get_roi
+from rules.special_cases import (
     pensioner_rules,
     agriculturist_rules,
     cre_penalty,
     green_building_concession
 )
-from backend.utils.emi_calculator import calculate_emi
+from utils.emi_calculator import calculate_emi
 
 
 
