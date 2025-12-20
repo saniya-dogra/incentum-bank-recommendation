@@ -1,13 +1,6 @@
-import sys
-import os
-
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-
-
-
 from flask import Flask, request, jsonify
-from rules.eligibility_engine import bom_engine
-from utils.validators import validate_input
+from backend.rules.eligibility_engine import bom_engine
+from backend.utils.validators import validate_input
 import joblib
 
 app = Flask(__name__)
