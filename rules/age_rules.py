@@ -1,5 +1,3 @@
-# rules/age_rules.py
-
 def check_age(age, employment_type):
     if age < 21:
         return False, "Applicant below minimum age"
@@ -13,4 +11,4 @@ def check_age(age, employment_type):
     if employment_type == "pensioner" and age > 70:
         return False, "Pensioner age limit exceeded"
 
-    return True, "Age eligible"
+    return True, None
