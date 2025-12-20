@@ -16,7 +16,7 @@ user_data = {
     "employment_type": "salaried",
     "monthly_income": 60000,
     "annual_income": 720000,
-    "cibil": 780,
+    "cibil": 700,
     "loan_amount": 2500000,
     "property_cost": 3000000,
     "property_age": 5,
