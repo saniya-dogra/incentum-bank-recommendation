@@ -1,15 +1,16 @@
 import joblib
+import pandas as pd
 from rules.eligibility_engine import bom_engine
 
-# -----------------------------
+# -------------------------------------------------
 # Load trained ML model
-# -----------------------------
+# -------------------------------------------------
 model = joblib.load("ml/model.pkl")
 
-# -----------------------------
+# -------------------------------------------------
 # Dummy Incentum Form Data
 # (same structure as frontend form)
-# -----------------------------
+# -------------------------------------------------
 user_data = {
     "age": 30,
     "employment_type": "salaried",
@@ -30,9 +31,9 @@ user_data = {
 print("\n📩 USER INPUT (INCENTUM FORM DATA)")
 print(user_data)
 
-# -----------------------------
+# -------------------------------------------------
 # Step 1: Run Rules Engine
-# -----------------------------
+# -------------------------------------------------
 eligible, rule_result = bom_engine(user_data)
 
 print("\n📜 RULE ENGINE OUTPUT")
@@ -43,26 +44,33 @@ if not eligible:
     print("\n❌ Application rejected by bank rules")
     exit()
 
-# -----------------------------
-# Step 2: Run ML Model
-# -----------------------------
-X = [[
-    user_data["monthly_income"],
-    user_data["cibil"],
-    user_data["loan_amount"]
-]]
+# -------------------------------------------------
+# Step 2: Prepare ML Input (MATCH TRAINING FEATURES)
+# -------------------------------------------------
+X = pd.DataFrame([{
+    "income": user_data["monthly_income"],
+    "cibil": user_data["cibil"],
+    "loan": user_data["loan_amount"]
+}])
 
+print("\n🤖 ML MODEL INPUT")
+print(X)
+
+# -------------------------------------------------
+# Step 3: ML Prediction
+# -------------------------------------------------
 probability = model.predict_proba(X)[0][1] * 100
+probability = float(round(probability, 2))
 
 print("\n🤖 ML MODEL OUTPUT")
-print(f"Approval Probability: {probability:.2f}%")
+print(f"Approval Probability: {probability}%")
 
-# -----------------------------
-# Step 3: Bank Recommendation
-# -----------------------------
+# -------------------------------------------------
+# Step 4: Bank Recommendation Logic
+# -------------------------------------------------
 recommendation = {
     "bank": "Bank of Maharashtra",
-    "approval_probability": round(probability, 2),
+    "approval_probability": probability,
     "roi": rule_result["roi"],
     "emi": rule_result["emi"],
     "foir": rule_result["foir"],
