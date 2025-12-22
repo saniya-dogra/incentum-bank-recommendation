@@ -18,10 +18,13 @@ REQUIRED_FIELDS = [
 ]
 
 def validate_input(data):
+
+    # Required fields
     missing = [f for f in REQUIRED_FIELDS if f not in data]
     if missing:
         return False, f"Missing required fields: {', '.join(missing)}"
 
+    # Basic validations
     if data["monthly_income"] <= 0:
         return False, "Monthly income must be positive"
 
@@ -33,5 +36,19 @@ def validate_input(data):
 
     if data["tenure_years"] <= 0 or data["tenure_years"] > 30:
         return False, "Invalid tenure"
+
+    # Co-applicant validation (optional)
+    if "co_applicants" in data:
+        if not isinstance(data["co_applicants"], list):
+            return False, "co_applicants must be a list"
+
+        for person in data["co_applicants"]:
+            required = ["relation", "age", "monthly_income", "employment_type"]
+            for field in required:
+                if field not in person:
+                    return False, f"Missing co-applicant field: {field}"
+
+                if person["monthly_income"] <= 0:
+                    return False, "Invalid co-applicant income"
 
     return True, None
