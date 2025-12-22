@@ -13,7 +13,7 @@ y = df["approved"]
 model = Pipeline([
     ("scaler", StandardScaler()),
     ("clf", LogisticRegression(
-        max_iter=1000,
+        max_iter=2000,
         class_weight="balanced"
     ))
 ])
