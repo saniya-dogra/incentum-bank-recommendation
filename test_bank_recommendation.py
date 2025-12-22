@@ -8,44 +8,50 @@ from rules.eligibility_engine import bom_engine
 model = joblib.load("ml/model.pkl")
 
 # -------------------------------------------------
-# Dummy Incentum Form Data
-# (same structure as frontend form)
+# Dummy Incentum Form Data (User fills this)
 # -------------------------------------------------
 user_data = {
     "age": 30,
     "employment_type": "salaried",
     "monthly_income": 60000,
     "annual_income": 720000,
-    "cibil": 900,
+    "cibil": 780,
+
     "loan_amount": 2500000,
     "property_cost": 3000000,
+    "agreement_value": 3000000,
+    "realizable_value": 2800000,
+
     "property_age": 5,
     "city_type": "metro",
     "existing_emi": 5000,
     "tenure_years": 20,
     "loan_category": "purchase",
+
     "green_building": False,
     "is_third_property": False
 }
 
 print("\n📩 USER INPUT (INCENTUM FORM DATA)")
-print(user_data)
+for k, v in user_data.items():
+    print(f"{k}: {v}")
 
 # -------------------------------------------------
-# Step 1: Run Rules Engine
+# Step 1: Rule Engine Check
 # -------------------------------------------------
 eligible, rule_result = bom_engine(user_data)
 
-print("\n📜 RULE ENGINE OUTPUT")
+print("\n📜 RULE ENGINE RESULT")
 print("Eligible:", eligible)
-print("Details:", rule_result)
 
 if not eligible:
-    print("\n❌ Application rejected by bank rules")
+    print("❌ REJECTED REASON:", rule_result)
     exit()
 
+print("✅ RULE DETAILS:", rule_result)
+
 # -------------------------------------------------
-# Step 2: Prepare ML Input (MATCH TRAINING FEATURES)
+# Step 2: Prepare ML Input (ONLY TRAINED FEATURES)
 # -------------------------------------------------
 X = pd.DataFrame([{
     "income": user_data["monthly_income"],
@@ -53,20 +59,20 @@ X = pd.DataFrame([{
     "loan": user_data["loan_amount"]
 }])
 
-print("\n🤖 ML MODEL INPUT")
+print("\n🤖 ML INPUT TO MODEL")
 print(X)
 
 # -------------------------------------------------
 # Step 3: ML Prediction
 # -------------------------------------------------
 probability = model.predict_proba(X)[0][1] * 100
-probability = float(round(probability, 2))
+probability = round(float(probability), 2)
 
-print("\n🤖 ML MODEL OUTPUT")
+print("\n🤖 ML OUTPUT")
 print(f"Approval Probability: {probability}%")
 
 # -------------------------------------------------
-# Step 4: Bank Recommendation Logic
+# Step 4: Final Bank Recommendation
 # -------------------------------------------------
 recommendation = {
     "bank": "Bank of Maharashtra",
@@ -78,4 +84,5 @@ recommendation = {
 }
 
 print("\n🏦 FINAL BANK RECOMMENDATION")
-print(recommendation)
+for k, v in recommendation.items():
+    print(f"{k}: {v}")
