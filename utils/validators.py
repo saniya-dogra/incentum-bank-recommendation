@@ -8,6 +8,8 @@ REQUIRED_FIELDS = [
     "cibil",
     "loan_amount",
     "property_cost",
+    "agreement_value",
+    "realizable_value",
     "property_age",
     "city_type",
     "existing_emi",
@@ -16,12 +18,7 @@ REQUIRED_FIELDS = [
 ]
 
 def validate_input(data):
-    missing = []
-
-    for field in REQUIRED_FIELDS:
-        if field not in data:
-            missing.append(field)
-
+    missing = [f for f in REQUIRED_FIELDS if f not in data]
     if missing:
         return False, f"Missing required fields: {', '.join(missing)}"
 
@@ -33,5 +30,8 @@ def validate_input(data):
 
     if data["cibil"] < 300 or data["cibil"] > 900:
         return False, "Invalid CIBIL score"
+
+    if data["tenure_years"] <= 0 or data["tenure_years"] > 30:
+        return False, "Invalid tenure"
 
     return True, None

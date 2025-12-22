@@ -6,6 +6,8 @@ def max_ltv(loan_amount):
     else:
         return 0.75
 
-def check_ltv(loan_amount, property_cost):
-    ltv = loan_amount / property_cost
+
+def check_ltv(loan_amount, agreement_value, realizable_value):
+    effective_value = min(agreement_value, realizable_value)
+    ltv = loan_amount / effective_value
     return ltv <= max_ltv(loan_amount), ltv
