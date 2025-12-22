@@ -5,7 +5,7 @@ import pandas as pd
 
 from rules.eligibility_engine import bom_engine
 
-ROWS = 5000   # You can increase to 10k later
+ROWS = 20000   # You can increase to 10k later
 
 def generate_row():
     age = random.randint(21, 65)
