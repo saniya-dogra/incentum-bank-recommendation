@@ -13,9 +13,9 @@ model = joblib.load("ml/model.pkl")
 user_data = {
     "age": 30,
     "employment_type": "salaried",
-    "monthly_income": 70000,
+    "monthly_income": 30000,
     "annual_income": 720000,
-    "cibil": 720,
+    "cibil": 600,
 
     "loan_amount": 2500000,
     "property_cost": 3000000,
