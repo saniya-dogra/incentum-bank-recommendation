@@ -72,31 +72,20 @@ app = Flask(__name__)
 # Load ML model
 # ==========================================
 
-model = joblib.load(
-    "ml/model.pkl"
-)
+model = joblib.load("ml/model.pkl")
 
 
 # ==========================================
 # Health Check
 # ==========================================
 
-@app.route(
-    "/health",
-    methods=["GET"]
-)
+@app.route("/health", methods=["GET"])
 def health():
 
     return jsonify({
-
         "status": "healthy",
-
-        "service":
-            "AI Fintech Risk Manager",
-
-        "model":
-            "Logistic Regression"
-
+        "service": "AI Fintech Risk Manager",
+        "model": "Logistic Regression"
     })
 
 
@@ -104,16 +93,10 @@ def health():
 # Main Risk API
 # ==========================================
 
-@app.route(
-    "/recommend",
-    methods=["POST"]
-)
+@app.route("/recommend", methods=["POST"])
 def recommend():
 
-    data = request.get_json(
-        silent=True
-    )
-
+    data = request.get_json(silent=True)
 
     # ======================================
     # 1. Validate input
@@ -122,28 +105,17 @@ def recommend():
     if not data:
 
         return jsonify({
-
             "status": "Error",
-
-            "message":
-                "JSON request body required"
-
+            "message": "JSON request body required"
         }), 400
 
-
-    valid, message = validate_input(
-        data
-    )
-
+    valid, message = validate_input(data)
 
     if not valid:
 
         return jsonify({
-
             "status": "Error",
-
             "message": message
-
         }), 400
 
 
@@ -151,82 +123,40 @@ def recommend():
     # 2. Financial Rule Engine
     # ======================================
 
-    eligible, rule_result = bom_engine(
-        data
-    )
+    # Used for financial calculations such as
+    # EMI and ROI. It is NOT used as the
+    # final bank recommendation gate.
 
-
-    if not eligible:
-
-        return jsonify({
-
-            "status": "Rejected",
-
-            "decision": "REJECT",
-
-            "risk_level": "HIGH",
-
-            "recommended_action":
-                "REJECT_OR_VERIFY",
-
-            "reason": rule_result
-
-        })
+    _, rule_result = bom_engine(data)
 
 
     # ======================================
     # 3. Feature Engineering
     # ======================================
 
-    monthly_income = (
-        data["monthly_income"]
-    )
-
-    loan_amount = (
-        data["loan_amount"]
-    )
-
-    existing_emi = (
-        data["existing_emi"]
-    )
-
+    monthly_income = data["monthly_income"]
+    loan_amount = data["loan_amount"]
+    existing_emi = data["existing_emi"]
 
     property_value = min(
-
         data["agreement_value"],
-
         data["realizable_value"]
-
     )
-
 
     loan_to_income = (
-
-        loan_amount
-        /
+        loan_amount /
         (monthly_income * 12)
-
     )
-
 
     ltv = (
-
-        loan_amount
-        /
+        loan_amount /
         property_value
-
     )
-
 
     emi = rule_result["emi"]
 
-
     foir = (
-
-        emi
-        +
-        existing_emi
-
+        emi + existing_emi
     ) / monthly_income
 
 
@@ -236,47 +166,42 @@ def recommend():
 
     model_input = pd.DataFrame([{
 
-    "age": data["age"],
+        "age": data["age"],
 
-    "income": monthly_income,
+        "income": monthly_income,
 
-    "cibil": data["cibil"],
+        "cibil": data["cibil"],
 
-    "loan": loan_amount,
+        "loan": loan_amount,
 
-    "existing_emi": existing_emi,
+        "existing_emi": existing_emi,
 
-    "tenure": data["tenure_years"],
+        "tenure": data["tenure_years"],
 
-    "property_age": data["property_age"],
+        "property_age": data["property_age"],
 
-    "property_value": property_value,
+        "property_value": property_value,
 
-    "foir": foir,
+        "foir": foir,
 
-    "ltv": ltv,
+        "ltv": ltv,
 
-    "loan_to_income": loan_to_income,
+        "loan_to_income": loan_to_income,
 
-    "employment_type":
-        data["employment_type"],
+        "employment_type":
+            data["employment_type"],
 
-    "city_type":
-        data["city_type"]
+        "city_type":
+            data["city_type"]
 
-}])
+    }])
 
 
     probability = model.predict_proba(
-
         model_input
-
     )[0][1]
 
-
-    probability = float(
-        probability
-    )
+    probability = float(probability)
 
 
     # ======================================
@@ -285,17 +210,17 @@ def recommend():
 
     risk = calculate_risk(
 
-    probability,
+        probability,
 
-    foir,
+        foir,
 
-    ltv,
+        ltv,
 
-    data["cibil"],
+        data["cibil"],
 
-    loan_to_income
+        loan_to_income
 
-)
+    )
 
 
     risk_factors = explain_risk(
@@ -312,35 +237,37 @@ def recommend():
 
 
     # ======================================
-    # 6. Bank Recommendation
+    # 6. Multi-Bank Recommendation
     # ======================================
 
-    bank_recommendations = (
-        recommend_banks(
+    bank_recommendations = recommend_banks(
 
-            data["cibil"],
+        data["cibil"],
 
-            foir,
+        foir,
 
-            ltv,
+        ltv,
 
-            probability
+        probability
 
-        )
     )
 
 
-      # ======================================
-    # 7. Final Recommendation
+    # ======================================
+    # 7. Final Risk Decision
     # ======================================
 
     if risk["risk_level"] == "LOW":
-        decision = "RECOMMEND_APPROVAL"
-    elif risk["risk_level"] == "MEDIUM":
-        decision = "MANUAL_REVIEW"
-    else:
-        decision = "HIGH_RISK_REVIEW"
 
+        decision = "RECOMMEND_APPROVAL"
+
+    elif risk["risk_level"] == "MEDIUM":
+
+        decision = "MANUAL_REVIEW"
+
+    else:
+
+        decision = "HIGH_RISK_REVIEW"
 
 
     # ======================================
@@ -352,7 +279,6 @@ def recommend():
         "status": "Success",
 
         "decision": decision,
-
 
         "risk_assessment": {
 
@@ -369,16 +295,12 @@ def recommend():
                 ),
 
             "recommended_action":
-                risk[
-                    "recommended_action"
-                ]
+                risk["recommended_action"]
 
         },
 
-
         "risk_factors":
             risk_factors,
-
 
         "financial_metrics": {
 
@@ -408,7 +330,6 @@ def recommend():
 
         },
 
-
         "bank_recommendations":
             bank_recommendations
 
@@ -422,11 +343,7 @@ def recommend():
 if __name__ == "__main__":
 
     app.run(
-
         host="0.0.0.0",
-
         port=5000,
-
         debug=False
-
     )

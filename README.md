@@ -50,15 +50,14 @@ The model uses:
 
 ### 2. Financial Risk Assessment
 
-The system calculates a risk score using:
+The system combines the ML approval probability with financial indicators such as:
 
-- ML approval probability
 - CIBIL score
 - FOIR
 - Loan-to-Value ratio
 - Loan-to-Income ratio
 
-The applicant is categorized as:
+These factors are used to calculate an explainable risk score and classify the applicant as:
 
 - LOW RISK
 - MEDIUM RISK
@@ -77,9 +76,8 @@ Strong CIBIL score
 FOIR is within a comfortable range
 Moderately high loan-to-value ratio
 Loan-to-income ratio is reasonable
-```
+--
 
----
 
 ## 🏦 4. Multi-Bank Recommendation
 
