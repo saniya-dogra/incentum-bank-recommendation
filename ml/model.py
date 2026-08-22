@@ -1,13 +1,12 @@
 # ml/model.py
 
 import joblib
-
-MODEL_PATH = "ml/model.pkl"
+from backend.config import MODEL_PATH
 
 
 class ApprovalModel:
-    def __init__(self, model_path: str = MODEL_PATH):
-        self.model = joblib.load(model_path)
+    def __init__(self):
+        self.model = joblib.load(MODEL_PATH)
 
     def predict_probability(self, monthly_income, cibil, loan_amount):
         X = [[monthly_income, cibil, loan_amount]]
