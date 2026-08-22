@@ -76,7 +76,7 @@ Strong CIBIL score
 FOIR is within a comfortable range
 Moderately high loan-to-value ratio
 Loan-to-income ratio is reasonable
---
+---
 
 
 ## 🏦 4. Multi-Bank Recommendation
