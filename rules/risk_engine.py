@@ -190,27 +190,32 @@ def explain_risk(
 
     factors = []
 
-
     # ==========================================
     # CIBIL
     # ==========================================
 
-    if cibil < 700:
+    if cibil < 650:
 
         factors.append(
-            "Low CIBIL score increases credit risk"
+            f"CIBIL {cibil}: High credit risk"
+        )
+
+    elif cibil < 700:
+
+        factors.append(
+            f"CIBIL {cibil}: Below preferred range"
         )
 
     elif cibil < 750:
 
         factors.append(
-            "Moderate CIBIL score"
+            f"CIBIL {cibil}: Moderate credit strength"
         )
 
     else:
 
         factors.append(
-            "Strong CIBIL score"
+            f"CIBIL {cibil}: Strong credit profile"
         )
 
 
@@ -218,22 +223,27 @@ def explain_risk(
     # FOIR
     # ==========================================
 
+    foir_percent = round(
+        foir * 100,
+        2
+    )
+
     if foir > 0.70:
 
         factors.append(
-            "High FOIR indicates high repayment burden"
+            f"FOIR {foir_percent}%: High repayment burden"
         )
 
     elif foir > 0.60:
 
         factors.append(
-            "FOIR is moderately high"
+            f"FOIR {foir_percent}%: Moderately high repayment burden"
         )
 
     else:
 
         factors.append(
-            "FOIR is within a comfortable range"
+            f"FOIR {foir_percent}%: Comfortable repayment burden"
         )
 
 
@@ -241,47 +251,50 @@ def explain_risk(
     # LTV
     # ==========================================
 
+    ltv_percent = round(
+        ltv * 100,
+        2
+    )
+
     if ltv > 0.90:
 
         factors.append(
-            "High loan-to-value ratio"
+            f"LTV {ltv_percent}%: High loan-to-value risk"
         )
 
     elif ltv > 0.80:
 
         factors.append(
-            "Moderately high loan-to-value ratio"
+            f"LTV {ltv_percent}%: Moderately high"
         )
 
     else:
 
         factors.append(
-            "Loan-to-value ratio is within "
-            "a comfortable range"
+            f"LTV {ltv_percent}%: Within comfortable range"
         )
 
 
     # ==========================================
-    # Loan-to-income
+    # LOAN TO INCOME
     # ==========================================
 
     if loan_to_income > 7:
 
         factors.append(
-            "Loan amount is high compared "
-            "to annual income"
+            f"Loan-to-income {loan_to_income}: High"
         )
 
     elif loan_to_income > 5:
 
         factors.append(
-            "Loan-to-income ratio requires attention"
+            f"Loan-to-income {loan_to_income}: Requires attention"
         )
 
     else:
 
         factors.append(
-            "Loan-to-income ratio is reasonable"
+            f"Loan-to-income {loan_to_income}: Reasonable"
         )
 
 

@@ -64,6 +64,8 @@ from utils.validators import (
     validate_input
 )
 
+from . import config
+
 
 app = Flask(__name__)
 
@@ -72,7 +74,7 @@ app = Flask(__name__)
 # Load ML model
 # ==========================================
 
-model = joblib.load("ml/model.pkl")
+model = joblib.load(config.MODEL_PATH)
 
 
 # ==========================================
@@ -120,14 +122,38 @@ def recommend():
 
 
     # ======================================
-    # 2. Financial Rule Engine
+    # 2. Financial Rule Engine (Eligibility Gate)
     # ======================================
 
-    # Used for financial calculations such as
-    # EMI and ROI. It is NOT used as the
-    # final bank recommendation gate.
+    # bom_engine runs ALL hard eligibility checks:
+    # age, income, employment, tenure, property,
+    # loan purpose, special cases (pensioner /
+    # agriculturist), FOIR limit, and LTV limit.
+    # If the applicant fails ANY of these, this is
+    # the final gate — we reject here and never
+    # reach the ML model or bank matching stage.
 
-    _, rule_result = bom_engine(data)
+    eligible, rule_result = bom_engine(data)
+
+    if not eligible:
+
+        return jsonify({
+
+            "status": "Success",
+
+            "decision": "REJECTED",
+
+            "rejection_reason": rule_result,
+
+            "risk_assessment": None,
+
+            "risk_factors": [],
+
+            "financial_metrics": None,
+
+            "bank_recommendations": []
+
+        }), 200
 
 
     # ======================================
@@ -344,6 +370,6 @@ if __name__ == "__main__":
 
     app.run(
         host="0.0.0.0",
-        port=5000,
-        debug=False
+        port=config.PORT,
+        debug=config.DEBUG
     )

@@ -1,26 +1,47 @@
 # AI Fintech Risk Manager
 
-### Explainable ML-Based Loan Risk Assessment and Multi-Bank Recommendation System
+### Explainable ML-Based Loan Risk Assessment & Multi-Bank Recommendation
 
-An AI-powered fintech risk assessment system that evaluates a loan applicant's financial profile, predicts approval probability using Machine Learning, calculates financial risk, explains the major risk factors, and recommends the most suitable bank based on configurable lending profiles.
+An AI-powered fintech system that evaluates a loan applicant's financial profile, predicts loan approval probability using Machine Learning, calculates financial risk, explains the key risk factors, and recommends compatible lenders.
 
 ---
 
-## 🎯 Project Overview
+## 🎯 Problem
 
-Financial institutions need to evaluate applicants using multiple financial indicators such as credit score, income, existing liabilities, loan amount, property value, and repayment capacity.
+Loan assessment depends on multiple factors such as credit score, income, existing liabilities, loan amount, property value, and repayment capacity.
 
-This project combines:
+A simple approval prediction does not explain **why an applicant is risky** or **which lender may be more suitable**.
 
-- Machine Learning
-- Financial risk rules
-- Explainable risk assessment
-- Multi-bank recommendation
-- REST API
+This project combines **Machine Learning + financial rules + explainable risk scoring** to provide a more transparent loan risk assessment.
 
-to create an end-to-end **AI Fintech Risk Manager**.
+---
 
-The system goes beyond a simple loan approval prediction by combining the ML prediction with financial risk indicators and bank-specific configurable profiles to produce an explainable recommendation.
+## 💡 How It Works
+
+```text
+Applicant Details
+       ↓
+Input Validation
+       ↓
+Eligibility Rules
+       ↓
+EMI / FOIR / LTV Calculation
+       ↓
+Logistic Regression
+       ↓
+Approval Probability
+       ↓
+Risk Score & Explanation
+       ↓
+Bank Compatibility Matching
+```
+
+The system uses two complementary approaches:
+
+* **Rule-based checks** handle hard eligibility constraints.
+* **Machine Learning** estimates approval probability for eligible applicants.
+* **Risk scoring** combines ML output with important financial indicators.
+* **Bank matching** compares the applicant against configurable lender profiles.
 
 ---
 
@@ -28,171 +49,348 @@ The system goes beyond a simple loan approval prediction by combining the ML pre
 
 ### 1. AI-Based Approval Prediction
 
-A Logistic Regression model predicts the probability of loan approval using financial and applicant-level features.
+A **Logistic Regression** model predicts loan approval probability using:
 
-The model uses:
-
-- Age
-- Income
-- CIBIL score
-- Loan amount
-- Existing EMI
-- Loan tenure
-- Property age
-- Property value
-- FOIR
-- LTV
-- Loan-to-income ratio
-- Employment type
-- City type
-
----
+* Age
+* Income
+* CIBIL score
+* Loan amount
+* Existing EMI
+* Loan tenure
+* Property age
+* Property value
+* FOIR
+* LTV
+* Loan-to-income ratio
+* Employment type
+* City type
 
 ### 2. Financial Risk Assessment
 
-The system combines the ML approval probability with financial indicators such as:
+The system calculates:
 
-- CIBIL score
-- FOIR
-- Loan-to-Value ratio
-- Loan-to-Income ratio
+**FOIR**
 
-These factors are used to calculate an explainable risk score and classify the applicant as:
+```text
+(New EMI + Existing EMI) / Monthly Income
+```
 
-- LOW RISK
-- MEDIUM RISK
-- HIGH RISK
+**LTV**
 
----
+```text
+Loan Amount / Effective Property Value
+```
+
+**Loan-to-Income**
+
+```text
+Loan Amount / Annual Income
+```
+
+These indicators are combined with the ML prediction to generate a risk score.
 
 ### 3. Explainable Risk Assessment
 
-Instead of only returning a prediction, the system explains the major factors influencing the assessment.
-
-Example:
+The system provides understandable reasons behind the assessment, for example:
 
 ```text
 Strong CIBIL score
 FOIR is within a comfortable range
 Moderately high loan-to-value ratio
 Loan-to-income ratio is reasonable
----
-
-
-## 🏦 4. Multi-Bank Recommendation
-
-The system evaluates the applicant against configurable profiles of multiple banks and calculates a match score based on the applicant's financial profile.
-
-Currently supported banks:
-
-- Bank of Maharashtra
-- State Bank of India
-- HDFC Bank
-- ICICI Bank
-
-The highest-scoring eligible bank is selected as the final recommendation.
-
-Example:
-
-```text
-Bank of Maharashtra
-Match Score : 97.92
-Status      : ELIGIBLE
-
-State Bank of India
-Match Score : 60.86
-Status      : NOT ELIGIBLE
-
-HDFC Bank
-Match Score : 57.61
-Status      : NOT ELIGIBLE
-
-ICICI Bank
-Match Score : 57.61
-Status      : NOT ELIGIBLE
 ```
 
-> Bank profiles are configurable prototype policies and do not represent official lending criteria.
+### 4. Multi-Bank Recommendation
+
+The applicant is compared against configurable profiles for:
+
+* Bank of Maharashtra
+* State Bank of India
+* HDFC Bank
+* ICICI Bank
+
+Each profile contains parameters such as minimum CIBIL, maximum FOIR, and maximum LTV.
+
+> Bank profiles are prototype configurations created for demonstration and do not represent official lending criteria.
 
 ---
 
-## 🤖 5. Machine Learning Model
+## 🤖 Machine Learning
 
-The project uses a **Logistic Regression** model for loan approval prediction.
+### Model
 
-### Model Evaluation
+**Logistic Regression**
 
-- Accuracy: **67.33%**
-- Precision: **79.56%**
-- Recall: **67.29%**
-- F1 Score: **72.91%**
-- ROC-AUC: **73.14%**
+It was selected because the task is binary classification and the model provides an interpretable probability output while remaining lightweight and easy to evaluate.
 
-The training dataset is synthetically generated for the project.
+### Dataset
 
-> The approval probability shown for an individual applicant is different from the overall model accuracy.
+The project uses **20,000 synthetically generated applicant records**.
+
+Synthetic data is used because real lending data contains sensitive financial information and is not available for this student project.
+
+### Model Performance
+
+| Metric    |  Score |
+| --------- | -----: |
+| Accuracy  | 66.80% |
+| Precision | 80.31% |
+| Recall    | 65.59% |
+| F1 Score  | 72.21% |
+| ROC-AUC   | 72.50% |
+
+> These results are based on the synthetic dataset and should not be interpreted as production lending performance.
 
 ---
 
-## 🎯 6. Working Example
+## 📊 Risk Decision
 
-### Applicant Financial Profile
+The final risk score combines:
 
 ```text
-Age               : 30
-Employment        : salaried
-Monthly Income    : ₹300,000
-CIBIL Score       : 780
-Loan Amount       : ₹2,500,000
-Existing EMI      : ₹5,000
-Tenure            : 20 years
+35% → ML Risk
+20% → CIBIL Risk
+20% → FOIR Risk
+20% → LTV Risk
+ 5% → Loan-to-Income Risk
 ```
 
-### Financial Analysis
+The result is classified as:
 
 ```text
-Interest Rate     : 8.4%
-Monthly EMI       : ₹21,537.61
-FOIR              : 8.85%
-LTV               : 89.29%
-Loan/Income Ratio : 0.69
+LOW     → Recommend Approval
+MEDIUM  → Manual Review
+HIGH    → Reject or Verify
 ```
 
-### AI Risk Assessment
+Hard eligibility failures are rejected before the ML risk assessment stage.
+
+---
+
+## 🧪 Demo
+
+### Strong Applicant
 
 ```text
-Approval Probability : 89.61%
-Risk Score           : 17.64
+CIBIL              : 780
+Monthly Income     : ₹300,000
+Loan Amount        : ₹2,500,000
+Existing EMI       : ₹5,000
+Tenure             : 20 years
+```
+
+Result:
+
+```text
+Approval Probability : 91.37%
+Risk Score           : 17.02
 Risk Level           : LOW
-Recommended Action   : RECOMMEND_APPROVAL
+Decision              : RECOMMEND_APPROVAL
 ```
 
-### Risk Factors
+**Recommended Bank:** Bank of Maharashtra
+
+**Match Score:** 98.27
+
+---
+
+### Medium-Risk Applicant
 
 ```text
-• Strong CIBIL score
-• FOIR is within a comfortable range
-• Moderately high loan-to-value ratio
-• Loan-to-income ratio is reasonable
+CIBIL              : 660
+Monthly Income     : ₹70,000
+Loan Amount        : ₹2,500,000
+Existing EMI       : ₹15,000
+Tenure             : 20 years
 ```
 
-### Final Recommendation
+Result:
 
 ```text
-🏆 Bank of Maharashtra
-Match Score : 97.92
-Status      : ELIGIBLE
+Approval Probability : 34.73%
+Risk Score           : 43.85
+Risk Level           : MEDIUM
+Decision              : MANUAL_REVIEW
 ```
 
 ---
 
-## 🛠️ 7. Tech Stack
+### Hard Eligibility Failure
 
-- Python
-- Scikit-learn
-- Pandas
-- NumPy
-- Flask
-- Joblib
-- REST API
-- Git & GitHub
+A salaried applicant aged 63 fails the configured retirement-age rule.
+
+```text
+Decision: REJECTED
+Reason: Age exceeds retirement age
+```
+
+This applicant does not proceed to the ML risk assessment stage.
+
+---
+
+## 🔧 Development Challenge
+
+During development, one issue was identified in the processing flow: applicants who failed hard eligibility rules could potentially continue toward later stages of the pipeline.
+
+The Flask API was updated so that the eligibility engine acts as a clear gate:
+
+```text
+Eligibility Failed
+       ↓
+REJECTED
+```
+
+while eligible applicants continue to:
+
+```text
+Financial Metrics
+       ↓
+ML Prediction
+       ↓
+Risk Assessment
+       ↓
+Bank Recommendation
+```
+
+This made the decision flow more consistent and easier to explain.
+
+---
+
+## 🛠️ Tech Stack
+
+* **Python**
+* **Flask**
+* **Scikit-learn**
+* **Pandas**
+* **Joblib**
+* **Requests**
+* **REST API**
+* **Git & GitHub**
+
+---
+
+## 📁 Project Structure
+
+```text
+incentum-bank-recommendation/
+│
+├── backend/
+│   ├── app.py
+│   └── config.py
+│
+├── ml/
+│   ├── generate_training_data.py
+│   ├── train_model.py
+│   ├── train.csv
+│   └── model.pkl
+│
+├── rules/
+│   ├── age_rules.py
+│   ├── bank_profiles.py
+│   ├── bank_recommender.py
+│   ├── co_applicant_rules.py
+│   ├── eligibility_engine.py
+│   ├── employment_rules.py
+│   ├── foir_rules.py
+│   ├── income_rules.py
+│   ├── loan_purpose_rules.py
+│   ├── ltv_rules.py
+│   ├── property_rules.py
+│   ├── residual_life_rules.py
+│   ├── risk_engine.py
+│   ├── roi_rules.py
+│   ├── special_cases.py
+│   └── tenure_rules.py
+│
+├── utils/
+│   ├── emi_calculator.py
+│   └── validators.py
+│
+├── test_bank_recommendation.py
+├── requirements.txt
+├── .gitignore
+└── README.md
+```
+
+---
+
+## ▶️ Run Locally
+
+### 1. Install dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+### 2. Generate training data
+
+```bash
+python ml/generate_training_data.py
+```
+
+### 3. Train the model
+
+```bash
+python ml/train_model.py
+```
+
+### 4. Start the Flask API
+
+```bash
+python backend/app.py
+```
+
+### 5. Run the test cases
+
+Open another terminal:
+
+```bash
+python test_bank_recommendation.py
+```
+
+The test script demonstrates approved, rejected, and medium-risk applicants.
+
+---
+
+## 🔌 API
+
+### Health Check
+
+```http
+GET /health
+```
+
+### Loan Risk Assessment
+
+```http
+POST /recommend
+```
+
+The API returns:
+
+* Decision
+* Approval probability
+* Risk score
+* Risk level
+* Risk factors
+* Financial metrics
+* Bank recommendations
+
+---
+
+## ⚠️ Limitations
+
+This is a **student-level fintech prototype**.
+
+* The ML model is trained on synthetic data.
+* Bank profiles are configurable demonstration policies.
+* The model is not intended for real lending decisions.
+* Production use would require validated historical lending data, model monitoring, fairness testing, security controls, and regulatory compliance.
+
+---
+
+## 👩‍💻 Author
+
+**Saniya Dogra**
+
+AI • Machine Learning • Software Engineering • FinTech
