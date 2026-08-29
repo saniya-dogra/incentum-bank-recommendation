@@ -5,6 +5,7 @@ def calculate_risk(
     cibil,
     loan_to_income
 ):
+    
 
     # ==========================================
     # 1. ML MODEL RISK
@@ -237,6 +238,12 @@ def explain_risk(
     elif foir > 0.60:
 
         factors.append(
+            f"FOIR {foir_percent}%: Elevated repayment burden"
+        )
+
+    elif foir > 0.50:
+
+        factors.append(
             f"FOIR {foir_percent}%: Moderately high repayment burden"
         )
 
@@ -279,23 +286,26 @@ def explain_risk(
     # LOAN TO INCOME
     # ==========================================
 
+    lti_rounded = round(
+        loan_to_income,
+        2
+    )
+
     if loan_to_income > 7:
 
         factors.append(
-            f"Loan-to-income {loan_to_income}: High"
+            f"Loan-to-income {lti_rounded}: High"
         )
 
     elif loan_to_income > 5:
 
         factors.append(
-            f"Loan-to-income {loan_to_income}: Requires attention"
+            f"Loan-to-income {lti_rounded}: Requires attention"
         )
 
     else:
 
         factors.append(
-            f"Loan-to-income {loan_to_income}: Reasonable"
+            f"Loan-to-income {lti_rounded}: Reasonable"
         )
-
-
     return factors

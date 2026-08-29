@@ -31,6 +31,13 @@ def validate_input(data):
     if data["loan_amount"] <= 0:
         return False, "Loan amount must be positive"
 
+    # NEW — prevents ZeroDivisionError in LTV calculation
+    if data["agreement_value"] <= 0:
+        return False, "Agreement value must be positive"
+
+    if data["realizable_value"] <= 0:
+        return False, "Realizable value must be positive"
+
     if data["cibil"] < 300 or data["cibil"] > 900:
         return False, "Invalid CIBIL score"
 

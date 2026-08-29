@@ -1,9 +1,10 @@
 from flask import Flask, request, jsonify
 
+import sys
 import joblib
 import pandas as pd
 
-from rules.eligibility_engine import bom_engine
+from rules.eligibility_engine import check_eligibility
 
 from rules.risk_engine import (
     calculate_risk,
@@ -28,7 +29,31 @@ app = Flask(__name__)
 # Load ML model
 # ==========================================
 
-model = joblib.load(config.MODEL_PATH)
+try:
+    model = joblib.load(config.MODEL_PATH)
+except FileNotFoundError:
+    sys.exit(
+        f"Model file not found at '{config.MODEL_PATH}'. "
+        "Run 'python ml/generate_training_data.py' then "
+        "'python ml/train_model.py' first."
+    )
+except Exception as e:
+    sys.exit(f"Failed to load model: {e}")
+
+
+# ==========================================
+# Global Error Handler
+# ==========================================
+
+@app.errorhandler(Exception)
+def handle_unexpected_error(e):
+
+    app.logger.exception("Unhandled error")
+
+    return jsonify({
+        "status": "Error",
+        "message": "An unexpected error occurred while processing the request."
+    }), 500
 
 
 # ==========================================
@@ -79,15 +104,7 @@ def recommend():
     # 2. Financial Rule Engine (Eligibility Gate)
     # ======================================
 
-    # bom_engine runs ALL hard eligibility checks:
-    # age, income, employment, tenure, property,
-    # loan purpose, special cases (pensioner /
-    # agriculturist), FOIR limit, and LTV limit.
-    # If the applicant fails ANY of these, this is
-    # the final gate — we reject here and never
-    # reach the ML model or bank matching stage.
-
-    eligible, rule_result = bom_engine(data)
+    eligible, rule_result = check_eligibility(data)
 
     if not eligible:
 

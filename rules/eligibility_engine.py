@@ -19,7 +19,9 @@ from rules.special_cases import (
 from utils.emi_calculator import calculate_emi
 
 
-def bom_engine(data):
+
+def check_eligibility(data):          
+
 
     # -------------------------------------------------
     # 0️⃣ CO-APPLICANT PROCESSING
