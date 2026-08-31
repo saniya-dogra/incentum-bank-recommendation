@@ -337,7 +337,7 @@ python ml/train_model.py
 ### 4. Start the Flask API
 
 ```bash
-python backend/app.py
+python -m backend.app
 ```
 
 ### 5. Run the test cases
